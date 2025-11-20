@@ -5,7 +5,7 @@ interface Props {
   lugares?: number; // Número de lugares reservados (1, 2, 3, 4, etc.)
 }
 
-const { lugares = 2 } = Astro.props;
+const { lugares = 1 } = Astro.props;
 
 // Determinar si es singular o plural
 const esSingular = lugares === 1;
@@ -128,68 +128,87 @@ const textoLugares = esSingular ? "LUGAR" : "LUGARES";
       gsap.set("#texto-reserva", { opacity: 0, y: 30 });
       gsap.set("#numero-lugares", { opacity: 0, scale: 0.5 });
       gsap.set("#texto-lugares", { opacity: 0, y: -20 });
+      gsap.set("#corazones-reserva", { opacity: 0, scale: 0 });
+      gsap.set("#separador-reserva-bottom", { opacity: 0, y: 30, scale: 0.8 });
 
-      // ✨ ANIMACIÓN CON SCROLLTRIGGER - TODO AL MISMO TIEMPO
+      // ✨ ANIMACIÓN CON SCROLLTRIGGER
       ScrollTrigger.create({
         trigger: "#card-reserva",
         start: "top 85%",
         end: "top 20%",
         onEnter: () => {
-          // TODOS LOS ELEMENTOS SE ANIMAN SIMULTÁNEAMENTE
-          gsap.to("#separador-reserva-top", {
+          const tl = gsap.timeline();
+
+          // Separador superior
+          tl.to("#separador-reserva-top", {
             opacity: 1,
             y: 0,
             scale: 1,
             duration: 1,
             ease: "back.out(1.5)",
-          });
-
-          gsap.to("#card-reserva", {
+          })
+          // Card principal con efecto dramático
+          .to("#card-reserva", {
             opacity: 1,
             scale: 1,
             y: 0,
-            duration: 1,
+            duration: 1.2,
             ease: "back.out(1.3)",
-          });
-
-          gsap.to("#icono-reserva", {
+          }, "-=0.6")
+          // Ícono girando
+          .to("#icono-reserva", {
             opacity: 1,
             scale: 1,
             rotation: 0,
             duration: 1,
             ease: "elastic.out(1, 0.6)",
-          });
-
-          gsap.to("#texto-reserva", {
+          }, "-=0.8")
+          // Texto principal
+          .to("#texto-reserva", {
             opacity: 1,
             y: 0,
-            duration: 1,
+            duration: 0.8,
             ease: "power2.out",
-          });
-
-          gsap.to("#numero-lugares", {
+          }, "-=0.6")
+          // Número de lugares con explosión
+          .to("#numero-lugares", {
             opacity: 1,
             scale: 1,
-            duration: 1,
+            duration: 0.8,
             ease: "back.out(2)",
-          });
-
-          gsap.to("#texto-lugares", {
+          }, "-=0.4")
+          // Texto LUGAR/LUGARES
+          .to("#texto-lugares", {
             opacity: 1,
             y: 0,
-            duration: 1,
+            duration: 0.8,
             ease: "power2.out",
-          });
-
-          gsap.to("#hoja-reserva-top-izq, #hoja-reserva-top-der, #hoja-reserva-bottom-izq, #hoja-reserva-bottom-der", {
+          }, "-=0.6")
+          // Corazones decorativos
+          .to("#corazones-reserva", {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            ease: "back.out(1.5)",
+          }, "-=0.4")
+          // Hojas en las esquinas (todas al mismo tiempo)
+          .to("#hoja-reserva-top-izq, #hoja-reserva-top-der, #hoja-reserva-bottom-izq, #hoja-reserva-bottom-der", {
             opacity: 0.5,
             x: 0,
             y: 0,
-            duration: 1,
+            duration: 1.2,
             ease: "power3.out",
-          });
+          }, "-=0.8")
+          // Separador inferior
+          .to("#separador-reserva-bottom", {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1,
+            ease: "back.out(1.5)",
+          }, "-=0.6");
 
-          // 💫 ANIMACIONES CONTINUAS (después de la entrada)
+          // 💫 ANIMACIONES CONTINUAS
 
           // Pulso en el ícono
           gsap.to("#icono-reserva > div", {
@@ -209,6 +228,18 @@ const textoLugares = esSingular ? "LUGAR" : "LUGARES";
             yoyo: true,
             repeat: -1,
             delay: 1.2,
+          });
+
+          // Corazones latiendo
+          gsap.to("#corazones-reserva svg", {
+            scale: 1.15,
+            opacity: 1,
+            duration: 1.5,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+            stagger: 0.2,
+            delay: 1.5,
           });
 
           // Hojas superiores
@@ -264,6 +295,8 @@ const textoLugares = esSingular ? "LUGAR" : "LUGARES";
           gsap.set("#texto-reserva", { opacity: 0, y: 30 });
           gsap.set("#numero-lugares", { opacity: 0, scale: 0.5 });
           gsap.set("#texto-lugares", { opacity: 0, y: -20 });
+          gsap.set("#corazones-reserva", { opacity: 0, scale: 0 });
+          gsap.set("#separador-reserva-bottom", { opacity: 0, y: 30, scale: 0.8 });
         },
       });
 
@@ -309,6 +342,15 @@ const textoLugares = esSingular ? "LUGAR" : "LUGARES";
     transition: all 0.3s ease;
   }
 
+  /* Corazones con transición */
+  #corazones-reserva svg {
+    transition: all 0.3s ease;
+  }
+
+  #corazones-reserva:hover svg {
+    transform: scale(1.2);
+  }
+
   /* Hojas con animación */
   #hoja-reserva-top-izq,
   #hoja-reserva-top-der,
@@ -318,11 +360,13 @@ const textoLugares = esSingular ? "LUGAR" : "LUGARES";
   }
 
   /* Separadores con hover */
-  #separador-reserva-top img {
+  #separador-reserva-top img,
+  #separador-reserva-bottom img {
     transition: all 0.3s ease;
   }
 
-  #separador-reserva-top:hover img {
+  #separador-reserva-top:hover img,
+  #separador-reserva-bottom:hover img {
     transform: scale(1.08);
     filter: brightness(1.15);
   }
